@@ -1,0 +1,10 @@
+Joke
+joke 
+@i Joke 
+\"\'Joke!\'\"
+@i zoological
+@f new_output_reference.txt
+{.....
+cat cat cat
+@q
+@i zoological

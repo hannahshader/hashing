@@ -1,0 +1,315 @@
+Project 4: Gerp
+Authors: Hannah Shader and Aidan Banerjee
+
+Purpose:
+The purpose of this projects is to create a search program called gerp which 
+finds words in a large directory of files and subdirectories and prints out 
+the instances of those words as lines and filepaths. The command can find and
+ print words based on case sensitive and case insensitive searches. This 
+ project is based on the grep command.
+
+____________________________________________________________________________
+
+Acknowledgements:
+CS15 TAs:
+Ellis
+Tia
+
+Students: Talking though errors generally
+Jordan
+Jeff
+George
+Other people
+
+____________________________________________________________________________
+
+Files:
+
+DirNode.h
+	A file that declares a class for nodes in a tree, in which each node 
+    represents a directory. This file defines ways to build trees of 
+    directories and access different nodes and the files that are contained
+     within the directory. This is mostly implemented in conjunction with 
+     FSTree. Overall this class is used in gerp to help with printing line 
+     paths, based on the directory structure.
+
+FSTree.h
+	A file that declares a class for a tree, made up of file paths included
+     from DirNode.h. This class is made up of constructors, destructors, 
+     and a couple of functions for accessing elements in the tree in different
+      ways, including returning the root node of the tree. Overall this class
+       is used in gerp to help with printing line paths, based on the 
+       directory structure.
+mapClass.h
+This file contains the class, mapClass, which contains most of the 
+functions and logic for executing the gerp project. The class populates the
+data structure with the words and their pathways taken from files in the
+directory tree. It also contains a command loop to execute commands, 
+search through the data structure, and return the instances of certain 
+words, or switch the output file. This class will pull from 
+stringProcessing for some functionality. It also contains the private
+member functions which are used to define the ADT.
+
+WordNodeStruct.h
+	This file is used to contain a struct for wordNodes, which contains 
+    all of the information for a single word, including a file path, 
+    line number, and case sensitive string variation. This class was created 
+    out of necessity because of some linking errors in the makefile of the 
+    project, and need to access wordNodes across different classes.
+
+FSTreeTraversal.cpp
+    In Makefile, the file contains its own executable and main which when run, 
+    takes the highest directory as a command line argument and then prints out 
+    the full path of every file accessible from that directory. The file 
+    contains a recursive function which iterates through a FSTree, finds 
+    each file, and prints the path to that file. Importantly, the order of 
+    the paths printed is based on a pre-order traversal. The file is not 
+    used in project gerp, but its implementation is used to print out 
+    specific file paths to show where different words are in the provided 
+    directories. Look to the compiling/running section to see how to run the 
+    ./TreeTraversal executable. 
+	
+stringProcessing.h
+	This file defines a class that can strip any string of any 
+    non-alphanumeric characters on the front and back. This functionality
+    is used in project gerp to strip any words read in from the file path
+    before they are stored in our ADT, and then when searching for 
+    words on the commandline, the words are also stripped, ensuring 
+    that only valid words as defined by the spec are stored and found.
+
+stringProcessing.cpp
+	This file is used to define the functions for the stringProcessing class.
+    The functions defined in this class make use of the std::string functions
+    and pointers to the front of a string to strip the string of characters
+    in O(1) time. The file itself only contains two functions: One to 
+    strip the string, and one helper that checks each character for 
+    alphanumeric value. Calling the main function, stripAlphaNum, will 
+    accomplish the functionality of the class.
+
+mapClass.h
+	This file contains the class, mapClass, which contains most of the 
+    functions and logic for executing the gerp project. The class populates
+    the data structure with the words and their pathways taken from files 
+    in the directory tree. It also contains a command loop to execute 
+    commands, search through the data structure, and return the instances
+    of certain words, or switch the output file. This class will pull 
+    from stringProcessing for some functionality. It also contains the 
+    private member functions which are used to define the ADT.
+	
+mapClass.cpp
+	The mapClass.cpp file defines all the functions for inserting word 
+    instances and searching and printing functionality for the gerp project, 
+    based on words read in from files from a specified directory. 
+    The main function used in this class is 
+    the commandloop(for executing the project) along private helper functions 
+    for storing and populating the ADT. The class aims to work on large
+    data-sets, but it may take anywhere from 1-10 minutes to index words 
+    from a large directory. However, accessing words after should be near
+    constant time. The class can be used from the command line, based 
+    on the command loop, and case sensitive/insensitive searches may be
+    defined using @i, and other functionality can be found in the 
+    function headers.
+
+main.cpp
+    This file is used to run the gerp project using a mapClass object. 
+    Will run a main and take in arguments from the command line and then 
+    execute the function to store data from files into the ADT, and then
+    execute a function to run the query command loop, and then be sure 
+    to close all open file streams. 
+
+commands.txt 
+    This was the list of commands we ran to diff test with the reference
+    implementation. Note that the line @f new_output_reference.txt was 
+    changed to @f new_output.txt when running with our implementation
+    instead of the reference. 
+
+sorted_testing_file.txt 
+    This is the sorted version of what our program wrote to our given
+    output file given the command file. 
+
+sorted_testing_file_reference.txt
+    This is the sorted version of what the reference wrote to the given
+    output file given the command file. 
+
+sorted_new_output.txt 
+    After the @f command, this is the sorted version of what our program
+    wrote out given the command file. 
+
+sorted_new_output_reference.txt 
+    After the @f command, this is the sorted version of the reference
+    wrote out given the command file. 
+
+____________________________________________________________________________
+
+How to compile and Run:
+
+Compiling the program uses a Makefile. When in the directory, type:
+	make gerp
+For the program to run. To recompile, you may type:
+	make clean
+Before.
+
+Run the program on the command line using
+	./gerp [INPUT DIRECTORY] [OUTPUT FILE NAME]
+This will run the program on all the files in a specified input directory 
+and output the results of your queries to the output file
+
+Along with the ./gerp executable, FSTree.cpp contains it's own executable file.
+For this file to work using the Makefile, first comment out the main in 
+main.cpp and uncomment the main in FSTreeTraversal.cpp. Then run on 
+the command line: 
+	./treeTraversal [INPUT DIRECTORY]
+
+____________________________________________________________________________
+
+Architectural Overview: 
+
+Based on the directory structure, we have an FSTree made up of DirNodes, 
+with a pointer to the root of the tree. The FSTree populates the filepaths 
+which are stored in each individual wordNode. A wordNode is a struct we made 
+in its own .h file (because of circular linking issues). The wordnode is 
+made up of and can access the case sensitive word, its file path, line 
+number and the line contents. 
+
+Word Nodes are stored in a 3 dimensional ADT which operates primarily from 
+the use of vectors. The first dimension of the ADT is a Hash table. 
+The hash table takes case insensitive word keys from a wordnode, hashes 
+them, and mods them by the table size. The value of the hash table a struct 
+called canholdmany which has a boolean for whether it is filled and a 
+vector. If the hash table provides a collision the vector will be used 
+for chaining and this makes up the second dimension. The second dimension 
+vector contains structs called onlyholdone. These structs are made up of 
+the case insensitive string as a key, and a vector. The vector makes up 
+the third dimension and inside the last vector, every case sensitive wordnode
+version of the case insensitive struct key is held. To summarize, 
+the first dimension array is a hash table; the second dimension is a 
+vector of case insensitive versions of a word; and the third dimension 
+is every case sensitive version of the word listed. Much of the functionality 
+of the ADT, including inserting word nodes and expanding the Hashtable are 
+handled in the mapClass class.
+
+Importantly, All of the functions in mapClass from reading in files to 
+inserting wordnodes into the 3D ADT are linked through calls of helper 
+functions, creating one continuous flow process. This makes abstraction 
+of our data structure difficult. 
+
+The last class used in the project is Print. Print handles all of the 
+functionality of accessing the ADT, traversing through the vectors, and 
+printing the proper wordnotes in the form of one line printed to an output 
+file. 
+
+____________________________________________________________________________
+
+Data structures and Algorithms: 
+
+As we read in from the files, the algorithms that we used were a function that
+inserted each word, and an algorithm that rehashed when our load factor went 
+over 0.75. First, to know where to insert words from, we created an FSTree 
+with all of the different directories and files, with each file being a leaf 
+on that tree. Recursively, we traversed that tree. Every time we got to a 
+leaf, we would read file contents with a filename and a file path we saved 
+while traversing the tree to a leaf. At this point, when we had reached a 
+leaf, our insertion and rehashing functions would be called, as we read in 
+each word.
+
+When inserting a word from a file, we first checked to see if a version of 
+that word had already been added to our ADT. We stored all case insensitive 
+versions of a word together in a vector, which were stored in a struct in our 
+large array on the heap. If no version of that word had already been 
+populated, we needed to create a new struct that contained a new vector. 
+We checked if a slot in our large array had already been populated with a 
+word by creating a filled boolean that we checked. If the hash value for a 
+word to add to the array corresponded to a struct that was empty, we created 
+a new struct and added that word to the vector.
+
+If this first check failed, we knew that something was already in the slot of 
+the array corresponding to the hash value returned from the current word. 
+Now, we needed to check if this slot was filled with a vector of case 
+variations of our current word, or if there had been a collision, and the 
+slot was filled with a completely different word. In each slot, we had a 
+struct that contained a vector. This vector could contain structs of 
+completely different words, for the case that multiple words were chaining 
+to the same slot. We created a function, match value, that returned the index
+of this vector where the current word matched the key (case insensitive) of
+the struct. This way, we could use that index to add our current word to 
+the vector containing all other instances/variations of that word.
+
+Our match value function would return a negative index if we found no 
+variations of our current word in that vector. This would indicate that 
+there was a collision, and our word hadn't been seen before. In this case, 
+we would add our word in struct to the back of the vector containing 
+possible different words chained to the given slot. 
+
+Every time we did one of these insertions, we would update a counter 
+that tracked how many different instances of words there were in our ADT. 
+When we found that the number of keys divided by the number of slots or 
+possible indices in the array exceeded 0.75, we expanded and rehashed.
+
+We rehashed by creating a new array that was twice the size of the old array.
+Then, we went through each slot of our old array, and inspected each 
+possible grouping/variations of a word chained at an index of the array.
+Using our new table size, we called our hash value function to get a new 
+hash value for variations of this word, using an all lowercase version of 
+the word. Then we added the word, and all of its variations, to this index 
+at the new array. When all words had been moved this way, we deleted the 
+old array, and assigned the new array to our class variable.
+
+We continued inserting and rehashing until the entire directory given was gone. 
+
+____________________________________________________________________________
+
+Testing: 
+
+
+After a lot of deliberation and trouble with our linked list structure. 
+We decided to redesign the project to use a 3D vector list. 
+
+The majority of our functions were put into map class and restructured to 
+use vectors and vector functions instead of linked lists. 
+
+The majority of our testing came from testing in main using different test 
+cases and catching instances of errors with inline print statements on 
+specific functions. When building functions, we printed out information 
+regarding the variables we were assigning and using for operations, to make 
+sure that our functions were running with the values that we expected. 
+We frequently used print statements to track specific instances of a word, 
+like “Joke” or “cat”, or make sure that they were being constructed, chained, 
+or added as expected. This helped us track our code when there were far too 
+many words to track what our program was doing for each one. 
+
+At the beginning of our important functions, we also used print statements 
+to make sure that the program was running the functions, and not skipping 
+over them.
+
+When running our program, we visually checked to compare the number of times 
+“Query” or the goodbye statement had been printed.
+
+We used diff on output test files. We used the diff to ensure that our 
+printing was working both on small and medium gutenberg directories. 
+
+We looked for different versions of case sensitive and case insensitive 
+words, tested when the same word was on the same line of different files, 
+and the same lines of the same file. We also tested cases with wonky special 
+characters, and different capitalizations. We also checked multiple commands 
+on the same line, in terminal and in a file. We also diff tested the 
+different output files when we changed the output stream. We tested diff 
+for empty files and nonexistent words. We tested with running Gerp using the 
+terminal, and reading commands in through a file. We tested versions of 
+commands from a file where @q appeared before the end of the file, or where 
+.eof() would return true at the same time @q would read in. We used the 
+reference implementation to check to make sure our code did what was 
+expected. We created files with the same word multiple times on a line, 
+to make sure that duplicates weren't happening.
+
+Along with this, we used valgrind to both catch memory leaks and track down 
+errors in our code.
+
+While diff testing we ran into issues with certain words not being printed 
+out onto the command line. The words in the vector were being lost between 
+their insertion into the ADT and their retrieval in the print statements. 
+Using valgrind and print statements in different functions, we tested cases 
+for pass by reference problems, issues with duplicates, long files, 
+incorrect indexing, rehashing helpers functions. Due to the sheer amount 
+of difficult bugs, many edge cases were caught including a case in our rehash
+function which was what was originally the issue, and we also caught an edge 
+case for our duplicate function.
